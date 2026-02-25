@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Eyezen</title>
+    <link rel="stylesheet" href="css/popup.css">
+    <script src="js/libs/jquery-2.2.3.min.js"></script>
+</head>
+<body>
+
+    <div class="top">
+        <a class="brand" href="exercises.html" target="_blank">Eyezen</a>
+        <button id="toggleAlarm">Enable</button>
+    </div>
+
+    <div class="wrapper">
+        <label>Break every</label>
+        <div class="select-wrapper">
+            <label for="interval"></label>
+            <select id="interval" name="interval">
+                <option value="20">20 min</option>
+                <option value="30">30 min</option>
+                <option value="60">1 hr</option>
+                <option value="120">2 hr</option>
+            </select>
+        </div>
+
+        <div id="countdown-clock">
+            <span class="hours">00</span><!--
+         --><span> : </span><!--
+         --><span class="minutes">00</span><!--
+         --><span> : </span><!--
+         --><span class="seconds">00</span>
+        </div>
+
+        <a class="train-link" href="exercises.html" target="_blank">Start Training</a>
+    </div>
+
+<script src="js/countdown.js"></script>
+<script src="js/popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eyezen — Eye Training</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+      background: #354c74;
+    }
+
+    #gradient {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    #app {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      text-align: center;
+    }
+
+    /* Start screen */
+    .screen { display: none; }
+    .screen.active { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+
+    #start-screen .title { font-size: 48px; font-weight: 300; letter-spacing: -1px; }
+    #start-screen .subtitle { font-size: 18px; opacity: 0.8; max-width: 420px; line-height: 1.6; }
+
+    .btn {
+      display: inline-block;
+      border: 3px solid #fff;
+      color: #fff;
+      background: none;
+      border-radius: 30px;
+      font-size: 18px;
+      padding: 14px 36px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .btn:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.08); }
+
+    /* Exercise screen */
+    #exercise-screen {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    #exercise-screen.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 8vh;
+    }
+
+    .exercise-title { font-size: 34px; font-weight: 300; margin-bottom: 4px; }
+    .exercise-timer {
+      font-size: 80px;
+      font-weight: 700;
+      padding: 30px 0 20px;
+    }
+    .exercise-hint {
+      font-size: 18px;
+      opacity: 0.85;
+      max-width: 400px;
+      line-height: 1.5;
+    }
+
+    /* Progress bar */
+    #progress-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background: rgba(255,255,255,0.6);
+      transition: width 1s linear;
+      z-index: 10;
+    }
+
+    /* Dot arena */
+    #dot-arena {
+      position: fixed;
+      top: 5vh;
+      left: 5vw;
+      right: 5vw;
+      bottom: 40vh;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    #dot {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #fff;
+      margin-left: -15px;
+      margin-top: -15px;
+      opacity: 0;
+      will-change: top, left, transform, opacity;
+    }
+
+    /* Animations */
+    .anim-pulse #dot {
+      top: 50%; left: 50%;
+      opacity: 0.5;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.5; }
+      20% { transform: scale(1.5); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.5; }
+    }
+
+    .anim-updown #dot {
+      left: 50%; top: 0;
+      opacity: 1;
+      animation: updown 4s infinite;
+    }
+    @keyframes updown {
+      0% { opacity: 0.1; top: 50%; }
+      20% { opacity: 1; top: 0; }
+      25% { opacity: 1; top: 0; }
+      45% { opacity: 0.1; top: 50%; }
+      50% { opacity: 0.1; top: 50%; }
+      70% { opacity: 1; top: 100%; }
+      75% { opacity: 1; top: 100%; }
+      95% { opacity: 0.1; top: 50%; }
+      100% { opacity: 0.1; top: 50%; }
+    }
+
+    .anim-leftright #dot {
+      top: 50%; left: 0;
+      opacity: 1;
+      animation: leftright 4s infinite;
+    }
+    @keyframes leftright {
+      0% { opacity: 0.1; left: 50%; }
+      20% { opacity: 1; left: 0; }
+      25% { opacity: 1; left: 0; }
+      45% { opacity: 0.1; left: 50%; }
+      50% { opacity: 0.1; left: 50%; }
+      70% { opacity: 1; left: 100%; }
+      75% { opacity: 1; left: 100%; }
+      95% { opacity: 0.1; left: 50%; }
+      100% { opacity: 0.1; left: 50%; }
+    }
+
+    .anim-diagonal #dot {
+      top: 100%; left: 0;
+      opacity: 1;
+      animation: diagonal 3s infinite;
+    }
+    @keyframes diagonal {
+      0% { top: 100%; left: 0; opacity: 1; }
+      25% { top: 0; left: 0; opacity: 1; }
+      37.5% { opacity: 0.1; }
+      50% { top: 100%; left: 100%; opacity: 1; }
+      75% { top: 0; left: 100%; opacity: 1; }
+      87.5% { opacity: 0.1; }
+      100% { top: 100%; left: 0; opacity: 1; }
+    }
+
+    .anim-clockwise #dot-arena {
+      animation: rotate-arena 4s linear infinite;
+    }
+    .anim-clockwise #dot {
+      top: 10px; left: 50%;
+      opacity: 1;
+    }
+    @keyframes rotate-arena {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .anim-spiral #dot-arena {
+      animation: spiral-rotate 5s linear infinite;
+    }
+    .anim-spiral #dot {
+      top: 10px; left: 50%;
+      opacity: 1;
+      animation: spiral-inward 6s linear infinite;
+    }
+    @keyframes spiral-rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(-1080deg); }
+    }
+    @keyframes spiral-inward {
+      0% { top: 10px; left: 50%; opacity: 1; }
+      100% { top: 50%; left: 50%; opacity: 0; }
+    }
+
+    .anim-nearfar #dot {
+      top: 50%; left: 50%;
+      opacity: 1;
+      animation: nearfar 6s infinite;
+    }
+    @keyframes nearfar {
+      0%   { transform: scale(1); filter: blur(0px); opacity: 1; }
+      15%  { transform: scale(2.5); filter: blur(6px); opacity: 0.4; }
+      25%  { transform: scale(2.5); filter: blur(6px); opacity: 0.4; }
+      40%  { transform: scale(1); filter: blur(0px); opacity: 1; }
+      50%  { transform: scale(1); filter: blur(0px); opacity: 1; }
+      65%  { transform: scale(0.4); filter: blur(4px); opacity: 0.5; }
+      75%  { transform: scale(0.4); filter: blur(4px); opacity: 0.5; }
+      90%  { transform: scale(1); filter: blur(0px); opacity: 1; }
+      100% { transform: scale(1); filter: blur(0px); opacity: 1; }
+    }
+
+    /* Done screen */
+    #done-screen .title { font-size: 36px; font-weight: 300; }
+    #done-screen .subtitle {
+      font-size: 18px;
+      opacity: 0.8;
+      max-width: 400px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div id="gradient"></div>
+
+  <div id="app">
+    <div id="start-screen" class="screen active">
+      <div class="title">Eyezen</div>
+      <div class="subtitle">
+        Follow the dot with your eyes. Move them as far as comfortable — hold at extreme points for a second.
+        <br><br>Total time: <strong>3 minutes 25 seconds</strong>
+      </div>
+      <button class="btn" id="start-btn">Start Exercises</button>
+    </div>
+
+    <div id="exercise-screen" class="screen">
+      <div class="exercise-title" id="ex-title"></div>
+      <div class="exercise-timer" id="ex-timer"></div>
+      <div class="exercise-hint" id="ex-hint"></div>
+    </div>
+
+    <div id="done-screen" class="screen">
+      <div class="title">Well Done!</div>
+      <div class="subtitle">Your eyes thank you. Take a short break from the screen.</div>
+      <button class="btn" id="restart-btn">Do It Again</button>
+    </div>
+  </div>
+
+  <div id="dot-arena"><div id="dot"></div></div>
+  <div id="progress-bar"></div>
+
+  <script src="js/exercises.js"></script>
+</body>
+</html>

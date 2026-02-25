@@ -1,0 +1,30 @@
+{
+  "name": "Eyezen",
+  "version": "2.0.0",
+  "manifest_version": 3,
+  "description": "Eye training exercises and break reminders to reduce screen fatigue.",
+  "icons": {
+    "16": "images/on.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "action": {
+    "default_icon": "images/on.png",
+    "default_popup": "popup.html",
+    "default_title": "Eyezen — Eye Training"
+  },
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["js/*", "css/*", "images/*", "audio/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
