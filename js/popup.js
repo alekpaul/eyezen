@@ -4,7 +4,7 @@ const ALARM_NAME = 'eyezenAlarm';
 
 const toggleBtn = document.getElementById('toggleAlarm');
 const intervalSelect = document.getElementById('interval');
-const wrapper = document.querySelector('.wrapper');
+const reminderSettings = document.getElementById('reminder-settings');
 
 // Alarm controls
 toggleBtn.addEventListener('click', async () => {
@@ -39,12 +39,12 @@ async function updateUI() {
   const alarm = await chrome.alarms.get(ALARM_NAME);
   if (alarm) {
     toggleBtn.textContent = 'Disable Reminders';
-    wrapper.style.display = 'block';
+    reminderSettings.style.display = 'block';
     chrome.action.setIcon({ path: 'images/on.png' });
     startCountdown('countdown-clock', alarm.scheduledTime);
   } else {
     toggleBtn.textContent = 'Enable Reminders';
-    wrapper.style.display = 'none';
+    reminderSettings.style.display = 'none';
     chrome.action.setIcon({ path: 'images/off.png' });
   }
 }
@@ -59,14 +59,21 @@ updateUI();
 const ambientSlider = document.getElementById('popup-ambient');
 const gongSlider = document.getElementById('popup-gong');
 const muteBtn = document.getElementById('popup-mute-btn');
+const muteIconOn = document.getElementById('mute-icon-on');
+const muteIconOff = document.getElementById('mute-icon-off');
 
 let soundPrefs = { ambientVolume: 0.08, gongVolume: 0.5, muted: false };
+
+function updateMuteIcon() {
+  muteIconOn.style.display = soundPrefs.muted ? 'none' : 'block';
+  muteIconOff.style.display = soundPrefs.muted ? 'block' : 'none';
+}
 
 chrome.storage.local.get('soundPrefs', (data) => {
   if (data.soundPrefs) Object.assign(soundPrefs, data.soundPrefs);
   ambientSlider.value = soundPrefs.ambientVolume;
   gongSlider.value = soundPrefs.gongVolume;
-  muteBtn.textContent = soundPrefs.muted ? 'Unmute' : 'Mute';
+  updateMuteIcon();
 });
 
 function saveSoundPrefs() {
@@ -85,6 +92,6 @@ gongSlider.addEventListener('input', () => {
 
 muteBtn.addEventListener('click', () => {
   soundPrefs.muted = !soundPrefs.muted;
-  muteBtn.textContent = soundPrefs.muted ? 'Unmute' : 'Mute';
+  updateMuteIcon();
   saveSoundPrefs();
 });

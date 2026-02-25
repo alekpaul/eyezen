@@ -19,10 +19,10 @@ Install from the [Chrome Web Store](https://chrome.google.com/webstore).
 ## Credits
 
 - Puzzled together by [Alek Pauls](https://www.threads.com/@alek_pauls)
-- Based on [blimb](https://github.com/foobarsik/blimb) by [Olga Panibratchenko](https://www.mehwow.com/)
+- Exercise sequence from [blimb](https://github.com/Pokhilenko/blimb) (MIT licensed)
 - Light effect by [David Haz](https://x.com/davidhdev)
 - Sound by [Alexander Jauk](https://pixabay.com/users/alex_jauk-16800354/) from [Pixabay](https://pixabay.com/sound-effects/)
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) — includes third-party MIT notice for blimb exercise sequence
