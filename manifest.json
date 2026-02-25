@@ -20,11 +20,5 @@
     "storage",
     "alarms",
     "notifications"
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": ["js/*", "css/*", "images/*", "audio/*"],
-      "matches": ["<all_urls>"]
-    }
   ]
 }

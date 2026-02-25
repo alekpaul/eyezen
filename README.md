@@ -1,12 +1,28 @@
-# BLIMB
-Chrome extension for blimb.su.  
-Reminds you to take breaks and helps you with eye exercises (regular eye exercises can help you to improve eyesight and prevent eye diseases).  
-Simple example of how you can use chrome alarm and chrome notification.
+# Eyezen
 
-## Quickstart
+Chrome extension for eye training exercises and break reminders to reduce screen fatigue.
 
-### Install local build in chrome
-- type chrome://extensions/ into the adressbar
-- activate developer mode
-- Load unpacked extension...
-- in directory tree open src-folder with this extension and click Ok
+Follow animated dots through 11 guided exercises — up-down, left-right, diagonal, clockwise, spiral, near-far, and relaxation breaks. Set a timer to remind you every 20, 30, 60, or 120 minutes. Ambient wind chimes and zen gong sounds create a calming experience.
+
+Total exercise time: 3 minutes 25 seconds.
+
+## Install
+
+### Chrome Web Store
+Install from the [Chrome Web Store](https://chrome.google.com/webstore).
+
+### Local development
+1. Go to `chrome://extensions/`
+2. Enable **Developer mode**
+3. Click **Load unpacked** and select this folder
+
+## Credits
+
+- Puzzled together by [Alek Pauls](https://www.threads.com/@alek_pauls)
+- Special thanks to [Olga Panibratchenko](https://www.linkedin.com/in/olga-panibratchenko) for the inspiration
+- Light effect by [David Haz](https://x.com/davidhdev)
+- Sound by [Alexander Jauk](https://pixabay.com/users/alex_jauk-16800354/) from [Pixabay](https://pixabay.com/sound-effects/)
+
+## License
+
+[MIT](LICENSE)
