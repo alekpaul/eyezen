@@ -1,46 +1,28 @@
-function getTimeRemaining(endtime) {
-    var t = Date.parse(endtime) - Date.parse(new Date());
-    var seconds = Math.floor((t / 1000) % 60);
-    var minutes = Math.floor((t / 1000 / 60) % 60);
-    var hours = Math.floor((t / (1000 * 60 * 60)) % 24);
+'use strict';
 
-    return {
-        'total': t,
-        'hours': hours,
-        'minutes': minutes,
-        'seconds': seconds
-    };
-}
+let countdownInterval = null;
 
-var timeinterval;
+function startCountdown(elementId, deadline) {
+  clearInterval(countdownInterval);
 
-function initializeClock(id, endtime) {
-    clearInterval(timeinterval);
+  const el = document.getElementById(elementId);
+  if (!el) return;
 
-    if (Date.parse(endtime) < Date.parse(new Date())) {
-        console.log('Невозмжно установить таймер, проверьте значение endtime');
-        return false;
-    };
+  const hours = el.querySelector('.hours');
+  const minutes = el.querySelector('.minutes');
+  const seconds = el.querySelector('.seconds');
 
-    var clock = document.getElementById(id);
-    var hoursSpan = clock.querySelector('.hours');
-    var minutesSpan = clock.querySelector('.minutes');
-    var secondsSpan = clock.querySelector('.seconds');
+  function pad(n) { return String(n).padStart(2, '0'); }
 
-    function updateClock() {
-        var t = getTimeRemaining(endtime);
-
-        hoursSpan.innerHTML = ('0' + t.hours).slice(-2);
-        minutesSpan.innerHTML = ('0' + t.minutes).slice(-2);
-        secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
-
-        if (t.total <= 0) {
-          clearInterval(timeinterval);
-      }
-
+  function tick() {
+    const remaining = Math.max(0, new Date(deadline) - Date.now());
+    const s = Math.floor(remaining / 1000);
+    hours.textContent = pad(Math.floor(s / 3600) % 24);
+    minutes.textContent = pad(Math.floor(s / 60) % 60);
+    seconds.textContent = pad(s % 60);
+    if (remaining <= 0) clearInterval(countdownInterval);
   }
 
-  updateClock();
-  
-  timeinterval = setInterval(updateClock, 1000);
+  tick();
+  countdownInterval = setInterval(tick, 1000);
 }

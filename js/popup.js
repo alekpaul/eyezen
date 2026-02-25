@@ -1,122 +1,90 @@
-(function($) {
-    'use strict';
+'use strict';
 
-    var alarmName = 'eyezenAlarm';
+const ALARM_NAME = 'eyezenAlarm';
 
-    $('#toggleAlarm').click(toggleAlarm);
+const toggleBtn = document.getElementById('toggleAlarm');
+const intervalSelect = document.getElementById('interval');
+const wrapper = document.querySelector('.wrapper');
 
-    $("#interval").change(resetAlarm);
+// Alarm controls
+toggleBtn.addEventListener('click', async () => {
+  const alarm = await chrome.alarms.get(ALARM_NAME);
+  if (alarm) {
+    await chrome.alarms.clear(ALARM_NAME);
+  } else {
+    await createAlarm();
+  }
+  updateUI();
+});
 
-    chrome.storage.local.get('interval', function(data) {
-        $("#interval").val(data.interval || '60');
-    });
+intervalSelect.addEventListener('change', async () => {
+  chrome.storage.local.set({ interval: intervalSelect.value });
+  await chrome.alarms.clear(ALARM_NAME);
+  await createAlarm();
+  updateUI();
+});
 
-    initialSettings();
+async function createAlarm() {
+  const data = await chrome.storage.local.get('interval');
+  const mins = parseInt(intervalSelect.value || data.interval || '60');
+  await chrome.alarms.create(ALARM_NAME, {
+    delayInMinutes: mins,
+    periodInMinutes: mins,
+  });
+  chrome.storage.local.set({ interval: mins });
+  startCountdown('countdown-clock', Date.now() + mins * 60000);
+}
 
-    chrome.alarms.get(alarmName, synchronizeClockWithAlarmTimer);
+async function updateUI() {
+  const alarm = await chrome.alarms.get(ALARM_NAME);
+  if (alarm) {
+    toggleBtn.textContent = 'Disable Reminders';
+    wrapper.style.display = 'block';
+    chrome.action.setIcon({ path: 'images/on.png' });
+    startCountdown('countdown-clock', alarm.scheduledTime);
+  } else {
+    toggleBtn.textContent = 'Enable Reminders';
+    wrapper.style.display = 'none';
+    chrome.action.setIcon({ path: 'images/off.png' });
+  }
+}
 
-    function toggleAlarm() {
-        chrome.alarms.get(alarmName, function(isAlarmExists) {
-            if (isAlarmExists) {
-                cancelAlarm();
-                initialSettings();
-            } else {
-                createAlarm(function() {
-                    initialSettings();
-                });
-            }
-        });
-    }
+// Init
+chrome.storage.local.get('interval', (data) => {
+  intervalSelect.value = data.interval || '60';
+});
+updateUI();
 
-    function resetAlarm() {
-        chrome.storage.local.set({ interval: $(this).val() });
-        chrome.alarms.get(alarmName, function(isAlarmExists) {
-            if (isAlarmExists) cancelAlarm();
-            createAlarm(function() {
-                initialSettings();
-            });
-        });
-    }
+// Sound settings
+const ambientSlider = document.getElementById('popup-ambient');
+const gongSlider = document.getElementById('popup-gong');
+const muteBtn = document.getElementById('popup-mute-btn');
 
-    function initialSettings() {
-        chrome.alarms.get(alarmName, function(isAlarmExists) {
-            var toggleLabel;
-            if (isAlarmExists) {
-                toggleLabel = 'Disable';
-                $(".wrapper").slideDown("fast");
-                chrome.action.setIcon({
-                    path: 'images/on.png'
-                });
-            } else {
-                toggleLabel = 'Enable';
-                $(".wrapper").slideUp("fast");
-                chrome.action.setIcon({
-                    path: 'images/off.png'
-                });
-            }
-            document.getElementById('toggleAlarm').innerText = toggleLabel;
-        });
-    }
+let soundPrefs = { ambientVolume: 0.08, gongVolume: 0.5, muted: false };
 
-    function synchronizeClockWithAlarmTimer(alarm) {
-        if (alarm) {
-            var deadline = new Date(alarm.scheduledTime).toUTCString();
-            initializeClock('countdown-clock', deadline);
-        }
-    };
+chrome.storage.local.get('soundPrefs', (data) => {
+  if (data.soundPrefs) Object.assign(soundPrefs, data.soundPrefs);
+  ambientSlider.value = soundPrefs.ambientVolume;
+  gongSlider.value = soundPrefs.gongVolume;
+  muteBtn.textContent = soundPrefs.muted ? 'Unmute' : 'Mute';
+});
 
-    function createAlarm(callback) {
-        chrome.storage.local.get('interval', function(data) {
-            var $interval = parseInt($("#interval").val() || data.interval || '60');
-            chrome.alarms.create(alarmName, {
-                delayInMinutes: $interval,
-                periodInMinutes: $interval
-            });
-            chrome.storage.local.set({ interval: $interval });
-            var deadline = new Date(Date.now() + $interval * 60 * 1000);
-            initializeClock('countdown-clock', deadline);
-            if (callback) callback();
-        });
-    }
+function saveSoundPrefs() {
+  chrome.storage.local.set({ soundPrefs });
+}
 
-    function cancelAlarm() {
-        chrome.alarms.clear(alarmName);
-    }
+ambientSlider.addEventListener('input', () => {
+  soundPrefs.ambientVolume = parseFloat(ambientSlider.value);
+  saveSoundPrefs();
+});
 
-    // Sound settings
-    var ambientSlider = document.getElementById('popup-ambient');
-    var gongSlider = document.getElementById('popup-gong');
-    var muteBtn = document.getElementById('popup-mute-btn');
+gongSlider.addEventListener('input', () => {
+  soundPrefs.gongVolume = parseFloat(gongSlider.value);
+  saveSoundPrefs();
+});
 
-    var soundPrefs = { ambientVolume: 0.08, gongVolume: 0.5, muted: false };
-
-    chrome.storage.local.get('soundPrefs', function(data) {
-        if (data.soundPrefs) {
-            soundPrefs = Object.assign(soundPrefs, data.soundPrefs);
-        }
-        ambientSlider.value = soundPrefs.ambientVolume;
-        gongSlider.value = soundPrefs.gongVolume;
-        muteBtn.textContent = soundPrefs.muted ? 'Unmute' : 'Mute';
-    });
-
-    function saveSoundPrefs() {
-        chrome.storage.local.set({ soundPrefs: soundPrefs });
-    }
-
-    ambientSlider.addEventListener('input', function() {
-        soundPrefs.ambientVolume = parseFloat(this.value);
-        saveSoundPrefs();
-    });
-
-    gongSlider.addEventListener('input', function() {
-        soundPrefs.gongVolume = parseFloat(this.value);
-        saveSoundPrefs();
-    });
-
-    muteBtn.addEventListener('click', function() {
-        soundPrefs.muted = !soundPrefs.muted;
-        muteBtn.textContent = soundPrefs.muted ? 'Unmute' : 'Mute';
-        saveSoundPrefs();
-    });
-
-})(jQuery);
+muteBtn.addEventListener('click', () => {
+  soundPrefs.muted = !soundPrefs.muted;
+  muteBtn.textContent = soundPrefs.muted ? 'Unmute' : 'Mute';
+  saveSoundPrefs();
+});

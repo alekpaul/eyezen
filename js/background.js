@@ -1,66 +1,50 @@
-(function() {
-    'use strict';
+'use strict';
 
-    chrome.alarms.onAlarm.addListener(function(alarm) {
-        chrome.action.setIcon({
-            path: 'images/break.gif'
-        });
-        createNotification();
-    });
+const ALARM_NAME = 'eyezenAlarm';
+const NOTIFICATION_ID = 'eyezenBreak';
 
-    chrome.notifications.onButtonClicked.addListener(function(notificationId, buttonIndex) {
-        if (buttonIndex === 0) {
-            chrome.tabs.create({
-                url: chrome.runtime.getURL("exercises.html")
-            });
-            chrome.storage.local.set({ lastExerciseTime: new Date().toISOString() });
-        }
-        chrome.notifications.clear(notificationId);
-    });
+chrome.alarms.onAlarm.addListener(() => {
+  chrome.action.setIcon({ path: 'images/break.gif' });
+  showBreakNotification();
+});
 
-    chrome.notifications.onClosed.addListener(function() {
-        chrome.action.setIcon({
-            path: 'images/on.png'
-        });
-    });
+chrome.notifications.onButtonClicked.addListener((id, btnIndex) => {
+  if (btnIndex === 0) {
+    chrome.tabs.create({ url: chrome.runtime.getURL('exercises.html') });
+    chrome.storage.local.set({ lastExerciseTime: Date.now() });
+  }
+  chrome.notifications.clear(id);
+});
 
-    function createNotification() {
-        chrome.storage.local.get('lastExerciseTime', function(data) {
-            var message;
-            if (!data.lastExerciseTime) {
-                message = 'Time to rest your eyes and do some exercises.';
-            } else {
-                var exerciseDuration = 4 * 1000 * 60;
-                var timePassed = Date.now() - Date.parse(data.lastExerciseTime) + exerciseDuration;
-                var hours = Math.floor((timePassed / (1000 * 60 * 60)) % 24);
-                var days = Math.floor(timePassed / (1000 * 60 * 60 * 24));
+chrome.notifications.onClosed.addListener(() => {
+  chrome.action.setIcon({ path: 'images/on.png' });
+});
 
-                if (days > 0) {
-                    message = 'Last exercise was ' + days + ' day' + (days > 1 ? 's' : '') + ' ago.';
-                } else if (hours > 0) {
-                    message = 'Last exercise was ' + hours + ' hour' + (hours > 1 ? 's' : '') + ' ago.';
-                } else {
-                    message = 'Last exercise was less than an hour ago. Keep it up!';
-                }
-            }
+function showBreakNotification() {
+  chrome.storage.local.get('lastExerciseTime', (data) => {
+    let message = 'Time to rest your eyes and do some exercises.';
 
-            var options = {
-                type: 'basic',
-                iconUrl: 'images/alarm.png',
-                title: 'Take a break',
-                message: message,
-                buttons: [{
-                    title: 'Start exercises',
-                    iconUrl: ''
-                }, {
-                    title: 'Skip',
-                    iconUrl: ''
-                }],
-                requireInteraction: true
-            };
+    if (data.lastExerciseTime) {
+      const elapsed = Date.now() - data.lastExerciseTime;
+      const hrs = Math.floor(elapsed / 3600000);
+      const days = Math.floor(elapsed / 86400000);
 
-            chrome.notifications.create('eyezenNotification', options);
-        });
+      if (days > 0) {
+        message = `Last exercise was ${days} day${days > 1 ? 's' : ''} ago.`;
+      } else if (hrs > 0) {
+        message = `Last exercise was ${hrs} hour${hrs > 1 ? 's' : ''} ago.`;
+      } else {
+        message = 'Last exercise was less than an hour ago. Keep it up!';
+      }
     }
 
-})();
+    chrome.notifications.create(NOTIFICATION_ID, {
+      type: 'basic',
+      iconUrl: 'images/alarm.png',
+      title: 'Take a break',
+      message,
+      buttons: [{ title: 'Start exercises' }, { title: 'Skip' }],
+      requireInteraction: true,
+    });
+  });
+}
