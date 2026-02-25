@@ -83,4 +83,40 @@
         chrome.alarms.clear(alarmName);
     }
 
+    // Sound settings
+    var ambientSlider = document.getElementById('popup-ambient');
+    var gongSlider = document.getElementById('popup-gong');
+    var muteBtn = document.getElementById('popup-mute-btn');
+
+    var soundPrefs = { ambientVolume: 0.08, gongVolume: 0.5, muted: false };
+
+    chrome.storage.local.get('soundPrefs', function(data) {
+        if (data.soundPrefs) {
+            soundPrefs = Object.assign(soundPrefs, data.soundPrefs);
+        }
+        ambientSlider.value = soundPrefs.ambientVolume;
+        gongSlider.value = soundPrefs.gongVolume;
+        muteBtn.textContent = soundPrefs.muted ? 'Unmute' : 'Mute';
+    });
+
+    function saveSoundPrefs() {
+        chrome.storage.local.set({ soundPrefs: soundPrefs });
+    }
+
+    ambientSlider.addEventListener('input', function() {
+        soundPrefs.ambientVolume = parseFloat(this.value);
+        saveSoundPrefs();
+    });
+
+    gongSlider.addEventListener('input', function() {
+        soundPrefs.gongVolume = parseFloat(this.value);
+        saveSoundPrefs();
+    });
+
+    muteBtn.addEventListener('click', function() {
+        soundPrefs.muted = !soundPrefs.muted;
+        muteBtn.textContent = soundPrefs.muted ? 'Unmute' : 'Mute';
+        saveSoundPrefs();
+    });
+
 })(jQuery);
