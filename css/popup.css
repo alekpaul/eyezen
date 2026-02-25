@@ -56,22 +56,37 @@ a {
     padding-bottom: 16px;
 }
 
-.top > a:hover {
-    opacity: 0.7;
+.start-btn {
+    display: block;
+    margin: 0 20px;
+    padding: 14px;
+    background: #fff;
+    color: #000;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.start-btn:hover {
+    background: #ddd;
 }
 
 #toggleAlarm {
     display: block;
-    margin: 20px auto 0;
+    margin: 14px auto 0;
     background: transparent;
-    border: 1px solid #444;
+    border: 1px solid rgba(255,255,255,0.2);
     border-radius: 4px;
-    padding: 10px 20px;
+    padding: 8px 18px;
     cursor: pointer;
-    color: #aaa;
-    font-size: 16px;
+    color: #777;
+    font-size: 12px;
     text-transform: uppercase;
     font-family: inherit;
+    letter-spacing: 1px;
 }
 
 #toggleAlarm:hover {
@@ -168,23 +183,6 @@ label {
     border: 1px solid #222;
 }
 
-.train-link {
-    display: block;
-    text-align: center;
-    margin-top: 16px;
-    padding: 10px;
-    background: #fff;
-    color: #000;
-    border-radius: 4px;
-    font-size: 14px;
-    text-transform: uppercase;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.train-link:hover {
-    background: #ddd;
-}
 /* WRAPPER END*/
 
 /*=== SOUND SETTINGS ===*/
