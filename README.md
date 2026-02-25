@@ -19,7 +19,7 @@ Install from the [Chrome Web Store](https://chrome.google.com/webstore).
 ## Credits
 
 - Puzzled together by [Alek Pauls](https://www.threads.com/@alek_pauls)
-- Special thanks to [Olga Panibratchenko](https://www.linkedin.com/in/olga-panibratchenko) for the inspiration
+- Based on [blimb](https://github.com/foobarsik/blimb) by [Olga Panibratchenko](https://www.mehwow.com/)
 - Light effect by [David Haz](https://x.com/davidhdev)
 - Sound by [Alexander Jauk](https://pixabay.com/users/alex_jauk-16800354/) from [Pixabay](https://pixabay.com/sound-effects/)
 
